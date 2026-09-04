@@ -1,0 +1,135 @@
+// This file defines the entire database structure.
+// Prisma will read this and auto-create all tables in PostgreSQL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------- COLLEGE (multi-tenant root) ----------
+model College {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  city      String?
+  state     String?
+  domain    String?  // optional: college email domain, e.g. "csjmu.ac.in" for verification
+  createdAt DateTime @default(now())
+
+  users              User[]
+  studentProfiles    StudentProfile[]
+  alumniProfiles     AlumniProfile[]
+  events             Event[]
+  jobs               Job[]
+  mentorshipRequests MentorshipRequest[]
+  donations          Donation[]
+}
+
+// ---------- USER (every logged-in person, any college) ----------
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  fullName   String
+  role       String   // "student" | "alumni" | "admin" | "super_admin"
+  provider   String   // "google" | "linkedin"
+  collegeId  String?
+  college    College? @relation(fields: [collegeId], references: [id])
+  createdAt  DateTime @default(now())
+
+  studentProfile StudentProfile?
+  alumniProfile  AlumniProfile?
+}
+
+// ---------- STUDENT PROFILE ----------
+model StudentProfile {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique
+  user                   User     @relation(fields: [userId], references: [id])
+  collegeId              String
+  college                College  @relation(fields: [collegeId], references: [id])
+  rollNumber             String?
+  branch                 String
+  currentYear            String   // "1st Year" ... "Final Year"
+  enrollmentYear         Int
+  expectedGraduationYear Int
+  phone                  String?
+  createdAt              DateTime @default(now())
+}
+
+// ---------- ALUMNI PROFILE ----------
+model AlumniProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  collegeId      String
+  college        College  @relation(fields: [collegeId], references: [id])
+  batchYear      Int
+  branch         String
+  currentCompany String?
+  designation    String?
+  sector         String?  // "IT/Software" | "Core Engineering" | "Higher Studies" | "Government" | "Business" | "Other"
+  city           String?
+  phone          String?
+  linkedinUrl    String?
+  isVerified     Boolean  @default(false)
+  createdAt      DateTime @default(now())
+
+  mentorshipRequestsReceived MentorshipRequest[] @relation("AlumniMentor")
+}
+
+// ---------- EVENTS ----------
+model Event {
+  id          String   @id @default(uuid())
+  collegeId   String
+  college     College  @relation(fields: [collegeId], references: [id])
+  title       String
+  description String?
+  eventDate   DateTime
+  createdBy   String   // email of admin who posted it
+  createdAt   DateTime @default(now())
+}
+
+// ---------- JOBS ----------
+model Job {
+  id           String   @id @default(uuid())
+  collegeId    String
+  college      College  @relation(fields: [collegeId], references: [id])
+  title        String
+  company      String
+  location     String?
+  description  String?
+  applyLink    String?
+  postedByEmail String
+  postedByRole  String
+  postedAt     DateTime @default(now())
+}
+
+// ---------- MENTORSHIP ----------
+model MentorshipRequest {
+  id            String   @id @default(uuid())
+  collegeId     String
+  college       College  @relation(fields: [collegeId], references: [id])
+  studentEmail  String
+  studentName   String
+  alumniId      String
+  alumni        AlumniProfile @relation("AlumniMentor", fields: [alumniId], references: [id])
+  message       String?
+  status        String   @default("pending") // pending | accepted | declined
+  createdAt     DateTime @default(now())
+}
+
+// ---------- DONATIONS ----------
+model Donation {
+  id         String   @id @default(uuid())
+  collegeId  String
+  college    College  @relation(fields: [collegeId], references: [id])
+  donorEmail String
+  donorName  String
+  batchYear  Int?
+  amount     Float
+  purpose    String
+  donatedAt  DateTime @default(now())
+}
