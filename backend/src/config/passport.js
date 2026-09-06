@@ -19,7 +19,7 @@ if (isGoogleConfigured) {
         clientID: googleClientId,
         clientSecret: googleClientSecret,
         callbackURL:
-          process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/auth/google/callback',
+          process.env.FRONTEND_URL || 'http://localhost:5000/auth/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
