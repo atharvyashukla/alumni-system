@@ -32,11 +32,11 @@ router.get(
   '/google/callback',
   (req, res, next) => {
     if (!isGoogleConfigured) {
-      return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=oauth_not_configured`);
+      return res.redirect(`${process.env.FRONTEND_URL || 'alumni-system-khaki.vercel.app'}/login?error=oauth_not_configured`);
     }
     passport.authenticate('google', {
       session: false,
-      failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=auth_failed`,
+      failureRedirect: `${process.env.FRONTEND_URL || 'alumni-system-khaki.vercel.app'}/login?error=auth_failed`,
     })(req, res, next);
   },
   handleOAuthCallback
