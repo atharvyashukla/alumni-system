@@ -19,7 +19,7 @@ if (isGoogleConfigured) {
         clientID: googleClientId,
         clientSecret: googleClientSecret,
         callbackURL:
-        process.env.FRONTEND_URL || 'http://https://alumni-system-mxhj.onrender.com/auth/google/callback',
+        process.env.GOOGLE_CALLBACK_URL || 'https://alumni-system-mxhj.onrender.com/auth/google/callback',
       },
       async (accessToken, refreshToken, profile, done) => {
         try {

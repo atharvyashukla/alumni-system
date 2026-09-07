@@ -36,7 +36,7 @@ router.get(
     }
     passport.authenticate('google', {
       session: false,
-      failureRedirect: `${process.env.FRONTEND_URL || 'alumni-system-khaki.vercel.app'}/login?error=auth_failed`,
+      failureRedirect: `${process.env.FRONTEND_URL || 'https://alumni-system-khaki.vercel.app'}/login?error=auth_failed`,
     })(req, res, next);
   },
   handleOAuthCallback
